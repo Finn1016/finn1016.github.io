@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+    <channel>
+      <title>Finn1016</title>
+      <link>https://finn1016.github.io</link>
+      <description>最近的10条笔记 on Finn1016</description>
+      <generator>Quartz -- quartz.jzhao.xyz</generator>
+      <item>
+    <title>关于</title>
+    <link>https://finn1016.github.io/about</link>
+    <guid>https://finn1016.github.io/about</guid>
+    <description><![CDATA[ 这里是 Finn1016。 这个网站记录我的学习笔记、项目经历和零散想法。内容涵盖计算机软硬件、机械设计、文史哲、音乐美术和生活琐事。 本站使用 Quartz 构建，托管于 GitHub Pages。. ]]></description>
+    <pubDate>Mon, 10 Aug 2026 09:08:12 GMT</pubDate>
+  </item><item>
+    <title>归档</title>
+    <link>https://finn1016.github.io/archive</link>
+    <guid>https://finn1016.github.io/archive</guid>
+    <description><![CDATA[ 按时间倒序排列。 2026 08-10 — Git 与 GitHub 基础 08-09 — Quartz 日常使用指南 08-08 — 个人网站搭建全记录. ]]></description>
+    <pubDate>Mon, 10 Aug 2026 09:08:12 GMT</pubDate>
+  </item><item>
+    <title>分类</title>
+    <link>https://finn1016.github.io/categories</link>
+    <guid>https://finn1016.github.io/categories</guid>
+    <description><![CDATA[ 工程 计算机 — 硬件架构、操作系统、编程、工具链、网络 机械设计 — CAD 建模、材料力学、制造工艺、运动机构 电路设计 — 模电/数电、PCB layout、电源、信号完整性 嵌入式 — MCU、RTOS、FPGA/Verilog、通信协议、驱动开发 人文 文史哲 — 读书笔记、历史、哲学随想 音乐美术 — 乐理、乐器练习、数字绘画、作品存档 其他 生活 — 做菜、日用技巧、折腾记录 网站搭建 — 本站的搭建与维护记录 . ]]></description>
+    <pubDate>Mon, 10 Aug 2026 09:08:12 GMT</pubDate>
+  </item><item>
+    <title>友链</title>
+    <link>https://finn1016.github.io/friends</link>
+    <guid>https://finn1016.github.io/friends</guid>
+    <description><![CDATA[  MorisCorner . ]]></description>
+    <pubDate>Mon, 10 Aug 2026 09:08:12 GMT</pubDate>
+  </item><item>
+    <title>欢迎</title>
+    <link>https://finn1016.github.io/</link>
+    <guid>https://finn1016.github.io/</guid>
+    <description><![CDATA[ 你好，这里是 Finn1016 这是我的个人网站。随机掉落以下内容： 计算机软硬件知识 机械设计知识 文史哲知识 音乐美术学习相关内容 生活知识（譬如说做菜） 目前网站刚刚建立，内容正在陆续整理中。关于本站的搭建过程，详见 个人网站搭建全记录。 . ]]></description>
+    <pubDate>Mon, 10 Aug 2026 09:08:12 GMT</pubDate>
+  </item><item>
+    <title>Git 与 GitHub 基础</title>
+    <link>https://finn1016.github.io/notes/%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/Git%E4%B8%8EGitHub%E5%9F%BA%E7%A1%80</link>
+    <guid>https://finn1016.github.io/notes/%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/Git%E4%B8%8EGitHub%E5%9F%BA%E7%A1%80</guid>
+    <description><![CDATA[ 概念 Git 是一个版本管理工具。它记录文件夹里每次改了什么、谁改的、什么时候改的。安装在本地电脑上，在终端里用 git 命令操作。 GitHub 是一个托管 Git 仓库的网站。把本地仓库推到 GitHub 之后，代码就有了云端备份，GitHub Pages 也能从仓库自动部署网站。 仓库（repository） 就是一个被 Git 跟踪的文件夹。PersonalWebsite/ 目录就是一个本地仓库。推送到 GitHub 之后，GitHub 上那份叫远程仓库。 提交（commit） 是 Git 的核心操作。把当前所有修改打成一个快照，附带一条说明信息。 分支（branch） 是一条独立的提... ]]></description>
+    <pubDate>Sun, 09 Aug 2026 00:00:00 GMT</pubDate>
+  </item><item>
+    <title>个人网站搭建全记录</title>
+    <link>https://finn1016.github.io/notes/%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/%E4%B8%AA%E4%BA%BA%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA%E5%85%A8%E8%AE%B0%E5%BD%95</link>
+    <guid>https://finn1016.github.io/notes/%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/%E4%B8%AA%E4%BA%BA%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA%E5%85%A8%E8%AE%B0%E5%BD%95</guid>
+    <description><![CDATA[ 本文记录本站从零搭建的完整过程。 需求 我需要一个个人网站，功能如下： 用 Markdown 写内容，发布后自动渲染为 HTML 按目录组织笔记（按主题分类，如电路设计、嵌入式、机械设计） 支持按标签检索 笔记之间能互相引用（双向链接） 全文搜索 数学公式渲染（电子信息的笔记大量涉及公式） 代码语法高亮（C、Python、Verilog、Shell 等） 构建为纯静态文件，部署到免费托管平台 不依赖数据库或后端服务 我不需要： 用户系统、评论系统 动态内容或服务端渲染 复杂的 CMS 后台 备选方案 Hugo Go 编写的静态网站生成器。模板语法是 Go 的 html/template，主题市... ]]></description>
+    <pubDate>Sun, 09 Aug 2026 00:00:00 GMT</pubDate>
+  </item><item>
+    <title>Quartz 日常使用指南</title>
+    <link>https://finn1016.github.io/notes/%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97</link>
+    <guid>https://finn1016.github.io/notes/%E7%BD%91%E7%AB%99%E6%90%AD%E5%BB%BA/%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97</guid>
+    <description><![CDATA[ 这是一份速查手册，涵盖本站（Quartz）的全部常用功能。每个功能配有源码和渲染效果，可以直接复制修改。 文件操作 创建新笔记 在 content/ 目录下新建 .md 文件即可。文件名会成为 URL 的一部分。 content/ notes/ 电路设计/ 如何选型MOS管.md ← 新建的笔记 文件夹即分类 Quartz 会把文件夹结构自动变成侧边栏导航和面包屑路径。 content/notes/电路设计/如何选型MOS管.md ↓ 自动生成 网站首页 &gt; notes &gt; 电路设计 &gt; 如何选型MOS管 基本格式 源码： # 一级标题 ## 二级标题 ### 三级标题 **... ]]></description>
+    <pubDate>Sat, 08 Aug 2026 00:00:00 GMT</pubDate>
+  </item>
+    </channel>
+  </rss>

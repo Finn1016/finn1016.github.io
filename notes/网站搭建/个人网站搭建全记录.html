@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh" dir="ltr"><head><title>个人网站搭建全记录 | Finn</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Finn1016"/><meta property="og:title" content="个人网站搭建全记录 | Finn"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="个人网站搭建全记录 | Finn"/><meta name="twitter:description" content="本文记录本站从零搭建的完整过程。 需求 我需要一个个人网站，功能如下： 用 Markdown 写内容，发布后自动渲染为 HTML 按目录组织笔记（按主题分类，如电路设计、嵌入式、机械设计） 支持按标签检索 笔记之间能互相引用（双向链接） 全文搜索 数学公式渲染（电子信息的笔记大量涉及公式） 代码语法高亮（C、Python、Verilog、Shell 等） 构建为纯静态文件，部署到免费托管平台 不依赖数据库或后端服务 我不需要： 用户系统、评论系统 动态内容或服务端渲染 复杂的 CMS 后台 备选方案 Hugo Go 编写的静态网站生成器。模板语法是 Go 的 html/template，主题市..."/><meta property="og:description" content="本文记录本站从零搭建的完整过程。 需求 我需要一个个人网站，功能如下： 用 Markdown 写内容，发布后自动渲染为 HTML 按目录组织笔记（按主题分类，如电路设计、嵌入式、机械设计） 支持按标签检索 笔记之间能互相引用（双向链接） 全文搜索 数学公式渲染（电子信息的笔记大量涉及公式） 代码语法高亮（C、Python、Verilog、Shell 等） 构建为纯静态文件，部署到免费托管平台 不依赖数据库或后端服务 我不需要： 用户系统、评论系统 动态内容或服务端渲染 复杂的 CMS 后台 备选方案 Hugo Go 编写的静态网站生成器。模板语法是 Go 的 html/template，主题市..."/><meta property="og:image:alt" content="本文记录本站从零搭建的完整过程。 需求 我需要一个个人网站，功能如下： 用 Markdown 写内容，发布后自动渲染为 HTML 按目录组织笔记（按主题分类，如电路设计、嵌入式、机械设计） 支持按标签检索 笔记之间能互相引用（双向链接） 全文搜索 数学公式渲染（电子信息的笔记大量涉及公式） 代码语法高亮（C、Python、Verilog、Shell 等） 构建为纯静态文件，部署到免费托管平台 不依赖数据库或后端服务 我不需要： 用户系统、评论系统 动态内容或服务端渲染 复杂的 CMS 后台 备选方案 Hugo Go 编写的静态网站生成器。模板语法是 Go 的 html/template，主题市..."/><meta property="twitter:domain" content="finn1016.github.io"/><meta property="og:url" content="https://finn1016.github.io/notes/网站搭建/个人网站搭建全记录"/><meta property="twitter:url" content="https://finn1016.github.io/notes/网站搭建/个人网站搭建全记录"/><link rel="icon" href="../../static/icon.png"/><meta name="description" content="本文记录本站从零搭建的完整过程。 需求 我需要一个个人网站，功能如下： 用 Markdown 写内容，发布后自动渲染为 HTML 按目录组织笔记（按主题分类，如电路设计、嵌入式、机械设计） 支持按标签检索 笔记之间能互相引用（双向链接） 全文搜索 数学公式渲染（电子信息的笔记大量涉及公式） 代码语法高亮（C、Python、Verilog、Shell 等） 构建为纯静态文件，部署到免费托管平台 不依赖数据库或后端服务 我不需要： 用户系统、评论系统 动态内容或服务端渲染 复杂的 CMS 后台 备选方案 Hugo Go 编写的静态网站生成器。模板语法是 Go 的 html/template，主题市..."/><meta name="generator" content="Quartz"/><link href="../../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiL2hvbWUvcnVubmVyL3dvcmsvZmlubjEwMTYuZ2l0aHViLmlvL2Zpbm4xMDE2LmdpdGh1Yi5pby9xdWFydHovY29tcG9uZW50cy9zdHlsZXMiLCJzb3VyY2VzIjpbIm1lcm1haWQuaW5saW5lLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUdGO0VBQ0U7OztBQUtGO0VBQ0U7RUFDQTs7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7O0FBR0Y7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTtFQUNBOztBQUlKO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFOztBQUlGO0VBQ0U7RUFDQTtFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmV4cGFuZC1idXR0b24ge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGZsb2F0OiByaWdodDtcbiAgcGFkZGluZzogMC40cmVtO1xuICBtYXJnaW46IDAuM3JlbTtcbiAgcmlnaHQ6IDA7IC8vIE5PVEU6IHJpZ2h0IHdpbGwgYmUgc2V0IGluIG1lcm1haWQuaW5saW5lLnRzXG4gIGNvbG9yOiB2YXIoLS1ncmF5KTtcbiAgYm9yZGVyLWNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICBib3JkZXI6IDFweCBzb2xpZDtcbiAgYm9yZGVyLXJhZGl1czogNXB4O1xuICBvcGFjaXR5OiAwO1xuICB0cmFuc2l0aW9uOiAwLjJzO1xuXG4gICYgPiBzdmcge1xuICAgIGZpbGw6IHZhcigtLWxpZ2h0KTtcbiAgICBmaWx0ZXI6IGNvbnRyYXN0KDAuMyk7XG4gIH1cblxuICAmOmhvdmVyIHtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgYm9yZGVyLWNvbG9yOiB2YXIoLS1zZWNvbmRhcnkpO1xuICB9XG5cbiAgJjpmb2N1cyB7XG4gICAgb3V0bGluZTogMDtcbiAgfVxufVxuXG5wcmUge1xuICAmOmhvdmVyID4gLmV4cGFuZC1idXR0b24ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNpdGlvbjogMC4ycztcbiAgfVxufVxuXG4jbWVybWFpZC1jb250YWluZXIge1xuICBwb3NpdGlvbjogZml4ZWQ7XG4gIGNvbnRhaW46IGxheW91dDtcbiAgei1pbmRleDogOTk5O1xuICBsZWZ0OiAwO1xuICB0b3A6IDA7XG4gIHdpZHRoOiAxMDB2dztcbiAgaGVpZ2h0OiAxMDB2aDtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgZGlzcGxheTogbm9uZTtcbiAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDRweCk7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC41KTtcblxuICAmLmFjdGl2ZSB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICB9XG5cbiAgJiA+ICNtZXJtYWlkLXNwYWNlIHtcbiAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWxpZ2h0KTtcbiAgICBib3JkZXItcmFkaXVzOiA1cHg7XG4gICAgcG9zaXRpb246IGZpeGVkO1xuICAgIHRvcDogNTAlO1xuICAgIGxlZnQ6IDUwJTtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZSgtNTAlLCAtNTAlKTtcbiAgICBoZWlnaHQ6IDgwdmg7XG4gICAgd2lkdGg6IDgwdnc7XG4gICAgb3ZlcmZsb3c6IGhpZGRlbjtcblxuICAgICYgPiAubWVybWFpZC1jb250ZW50IHtcbiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IDAgMDtcbiAgICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzIGVhc2U7XG4gICAgICBvdmVyZmxvdzogdmlzaWJsZTtcbiAgICAgIG1pbi1oZWlnaHQ6IDIwMHB4O1xuICAgICAgbWluLXdpZHRoOiAyMDBweDtcblxuICAgICAgcHJlIHtcbiAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICBib3JkZXI6IG5vbmU7XG4gICAgICB9XG5cbiAgICAgIHN2ZyB7XG4gICAgICAgIG1heC13aWR0aDogbm9uZTtcbiAgICAgICAgaGVpZ2h0OiBhdXRvO1xuICAgICAgfVxuICAgIH1cblxuICAgICYgPiAubWVybWFpZC1jb250cm9scyB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICBib3R0b206IDIwcHg7XG4gICAgICByaWdodDogMjBweDtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBnYXA6IDhweDtcbiAgICAgIHBhZGRpbmc6IDhweDtcbiAgICAgIGJhY2tncm91bmQ6IHZhcigtLWxpZ2h0KTtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICBib3gtc2hhZG93OiAwIDJweCA0cHggcmdiYSgwLCAwLCAwLCAwLjEpO1xuICAgICAgei1pbmRleDogMjtcblxuICAgICAgLm1lcm1haWQtY29udHJvbC1idXR0b24ge1xuICAgICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyO1xuICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjtcbiAgICAgICAgd2lkdGg6IDMycHg7XG4gICAgICAgIGhlaWdodDogMzJweDtcbiAgICAgICAgcGFkZGluZzogMDtcbiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgICBjb2xvcjogdmFyKC0tZGFyayk7XG4gICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDtcbiAgICAgICAgY3Vyc29yOiBwb2ludGVyO1xuICAgICAgICBmb250LXNpemU6IDE2cHg7XG4gICAgICAgIGZvbnQtZmFtaWx5OiB2YXIoLS1ib2R5Rm9udCk7XG4gICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG5cbiAgICAgICAgJjpob3ZlciB7XG4gICAgICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgICAgfVxuXG4gICAgICAgICY6YWN0aXZlIHtcbiAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMXB4KTtcbiAgICAgICAgfVxuXG4gICAgICAgIC8vIFN0eWxlIHRoZSByZXNldCBidXR0b24gZGlmZmVyZW50bHlcbiAgICAgICAgJjpudGgtY2hpbGQoMikge1xuICAgICAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgICAgIHBhZGRpbmc6IDAgMTJweDtcbiAgICAgICAgICBmb250LXNpemU6IDE0cHg7XG4gICAgICAgIH1cbiAgICAgIH1cbiAgICB9XG4gIH1cbn1cbiJdfQ== */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://finn1016.github.io/index.xml"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://finn1016.github.io/notes/网站搭建/个人网站搭建全记录-og-image.webp"/><meta property="og:image:url" content="https://finn1016.github.io/notes/网站搭建/个人网站搭建全记录-og-image.webp"/><meta name="twitter:image" content="https://finn1016.github.io/notes/网站搭建/个人网站搭建全记录-og-image.webp"/><meta property="og:image:type" content="image/.webp"/></head><body data-slug="notes/网站搭建/个人网站搭建全记录"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="../..">Finn1016</a></h2><div class="spacer mobile-only"></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 1rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>搜索</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="搜索些什么" placeholder="搜索些什么"/><div class="search-layout" data-preview="true"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="暗色模式"><title>暗色模式</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="亮色模式"><title>亮色模式</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="阅读模式"><title>阅读模式</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><nav class="nav-links"><ul><li class><a href="/">主页</a></li><li class><a href="/archive">归档</a></li><li class><a href="/categories">分类</a></li><li class><a href="/tags">标签</a></li><li class><a href="/friends">友链</a></li><li class><a href="/about">关于</a></li></ul></nav></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../../notes/">notes</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../../notes/网站搭建/">网站搭建</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>个人网站搭建全记录</a></div></nav><h1 class="article-title">个人网站搭建全记录</h1><p show-comma="true" class="content-meta"><time datetime="2026-08-09T00:00:00.000Z">2026年8月09日</time><span>13分钟阅读</span></p><ul class="tags"><li><a href="../../tags/教程" class="internal tag-link">教程</a></li><li><a href="../../tags/网站" class="internal tag-link">网站</a></li></ul></div></div><article class="popover-hint"><p>本文记录本站从零搭建的完整过程。</p>
+<h2 id="需求">需求<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#需求" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>我需要一个个人网站，功能如下：</p>
+<ul>
+<li>用 Markdown 写内容，发布后自动渲染为 HTML</li>
+<li>按目录组织笔记（按主题分类，如电路设计、嵌入式、机械设计）</li>
+<li>支持按标签检索</li>
+<li>笔记之间能互相引用（双向链接）</li>
+<li>全文搜索</li>
+<li>数学公式渲染（电子信息的笔记大量涉及公式）</li>
+<li>代码语法高亮（C、Python、Verilog、Shell 等）</li>
+<li>构建为纯静态文件，部署到免费托管平台</li>
+<li>不依赖数据库或后端服务</li>
+</ul>
+<p>我不需要：</p>
+<ul>
+<li>用户系统、评论系统</li>
+<li>动态内容或服务端渲染</li>
+<li>复杂的 CMS 后台</li>
+</ul>
+<h2 id="备选方案">备选方案<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#备选方案" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="hugo">Hugo<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#hugo" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Go 编写的静态网站生成器。模板语法是 Go 的 <code>html/template</code>，主题市场有 300 多个现成主题。构建速度在所有 SSG 中最快（毫秒级）。Hugo 的内容组织依赖 frontmatter 中的 <code>slug</code>、<code>categories</code>、<code>tags</code>，目录结构对 URL 的影响可以通过 <code>permalinks</code> 配置覆盖。</p>
+<p>不适合我的原因：模板语法较旧，双向链接需要额外配置，默认不解析 <code>[[wikilink]]</code> 语法。</p>
+<h3 id="hexo">Hexo<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#hexo" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Node.js 生态的博客框架，中文社区活跃。主题多，插件覆盖搜索、RSS、字数统计等常见功能。<code>hexo deploy</code> 一条命令部署到 GitHub Pages。</p>
+<p>不适合我的原因：本质是博客引擎，目录结构不会自动变成侧边栏导航，知识库形态需要大量手动配置。</p>
+<h3 id="vitepress">VitePress<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#vitepress" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Vue 团队维护的文档站点生成器。默认主题左侧树形导航 + 中间正文 + 右侧大纲，内置全文搜索（Pagefind），支持 Vue 组件嵌入 Markdown。文件目录自动映射为侧边栏结构。</p>
+<p>不适合我的原因：默认主题是文档风格，博客时间线功能弱，首页没有文章列表。适合纯文档站，不太适合博客 + 知识库混合形态。</p>
+<h3 id="nextjs--mdx">Next.js + MDX<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#nextjs--mdx" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>React 框架驱动，灵活度最高。MDX 允许在 Markdown 中直接使用 React 组件。缺点是需要写不少代码才能实现文件路由、标签系统、搜索等功能——本质上是从零搭一个 SSG。</p>
+<p>不适合我的原因：我的专业是电子信息而非前端，投入 4-6 周学 React 才能开始写内容，不划算。</p>
+<h3 id="obsidian--quartz">Obsidian + Quartz<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#obsidian--quartz" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Quartz 是一个专门将 Obsidian 格式的 Markdown 笔记构建为静态网站的工具。它解析 Obsidian 的 <code>[[wikilink]]</code> 语法并自动生成超链接和反向链接。项目由 <a href="https://github.com/jackyzha0/quartz" class="external">jackyzha0<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 维护，MIT 协议开源。</p>
+<p>选择它的原因：</p>
+<ol>
+<li><strong>原生支持双向链接</strong>。<code>[[笔记路径]]</code> 语法直接解析为 <code>&lt;a></code> 标签，同时生成反向链接数据，在页面右侧渲染”反向链接”面板。</li>
+<li><strong>目录即导航</strong>。<code>content/</code> 下的目录结构自动生成侧边栏文件树，不需要手动配置导航。</li>
+<li><strong>插件链完整</strong>。内置 LaTeX（KaTeX 引擎）、语法高亮（Shiki）、RSS、站点地图、OG 图片生成、全文搜索（Flexsearch）。</li>
+<li><strong>零前端代码</strong>。只写 Markdown，不碰 HTML/CSS/JS。</li>
+</ol>
+<h2 id="技术架构">技术架构<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#技术架构" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Quartz 的构建流程：</p>
+<pre><code>content/*.md          ← Markdown 源文件（你只写这个）
+    ↓
+[transformers]        ← 插件管线：解析 frontmatter、wikilink、Markdown → HTML
+    ↓
+[filters]             ← 过滤草稿等
+    ↓
+[emitters]            ← 输出：HTML 页面、RSS、sitemap、搜索索引、OG 图片
+    ↓
+public/               ← 纯静态文件（部署这个目录）
+</code></pre>
+<p>核心依赖：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>包</th><th>用途</th></tr></thead><tbody><tr><td><code>remark</code> / <code>rehype</code></td><td>Markdown → HTML 的统一生态（unified 体系）</td></tr><tr><td><code>shiki</code></td><td>代码语法高亮</td></tr><tr><td><code>katex</code></td><td>LaTeX 数学公式渲染</td></tr><tr><td><code>flexsearch</code></td><td>客户端全文搜索索引</td></tr><tr><td><code>preact</code></td><td>轻量 React 替代，渲染交互组件（搜索框、图谱、目录）</td></tr><tr><td><code>d3</code></td><td>关系图谱（右侧栏的笔记关联图）</td></tr><tr><td><code>ws</code></td><td>WebSocket 服务端，开发时热重载</td></tr></tbody></table></div>
+<h2 id="搭建过程">搭建过程<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#搭建过程" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="环境">环境<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#环境" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>操作系统：Windows 11</li>
+<li>Node.js：v24.14.0（通过 <a href="https://nodejs.org" class="external">nodejs.org<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 下载 <code>.msi</code> 安装）</li>
+<li>npm：v11.9.0（随 Node.js 打包安装）</li>
+<li>Git：v2.55.0（<a href="https://git-scm.com" class="external">git-scm.com<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> 下载）</li>
+<li>编辑器：VS Code（<a href="https://code.visualstudio.com" class="external">code.visualstudio.com<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>）</li>
+</ul>
+<p>验证安装：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">node</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --version</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">   # v24.14.0</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">npm</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --version</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # 11.9.0</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">git</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --version</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">    # 2.55.0</span></span></code></pre></figure>
+<h3 id="获取-quartz">获取 Quartz<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#获取-quartz" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 从 GitHub 克隆 v4 分支</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">git</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> clone</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --depth</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> https://github.com/jackyzha0/quartz.git</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 项目目录</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">cd</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 项目目录</span></span></code></pre></figure>
+<p><code>--depth 1</code> 只克隆最近一次提交，减少下载体积（完整仓库的历史约几百 MB，浅克隆只需几 MB）。</p>
+<p>如果 GitHub 连接不稳定（国内常见），可以在浏览器中打开 <code>https://github.com/jackyzha0/quartz/archive/refs/heads/v4.zip</code> 下载 ZIP，手动解压到目标目录。</p>
+<h3 id="安装依赖">安装依赖<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#安装依赖" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">npm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> install</span></span></code></pre></figure>
+<p>这一步下载约 500 个 npm 包到 <code>node_modules/</code>，安装后项目目录约 600MB。主要体积来自 <code>shiki</code>（语法高亮的语言定义文件）和 <code>katex</code>（数学字体）。</p>
+<p>如果 npm 下载慢，设置国内镜像：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">npm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> config</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> set</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> registry</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> https://registry.npmmirror.com</span></span></code></pre></figure>
+<h3 id="项目结构">项目结构<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#项目结构" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>安装完成后，目录如下：</p>
+<pre><code>项目目录/
+  content/              ← 唯一需要操作的目录
+    index.md            ←   首页（Markdown）
+  quartz/               ← 框架源码（TypeScript）
+    cfg.ts              ←   类型定义
+    plugins/            ←   插件实现
+    components/         ←   UI 组件
+    cli/                ←   命令行入口
+  quartz.config.ts      ← 站点配置
+  quartz.layout.ts      ← 页面布局配置
+  package.json          ← 依赖声明
+  tsconfig.json         ← TypeScript 编译选项
+</code></pre>
+<p>日常只操作 <code>content/</code> 目录，另外两个 <code>.ts</code> 配置文件初始化时改一次即可。</p>
+<h3 id="配置">配置<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#配置" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong><code>quartz.config.ts</code></strong> 控制站点元信息、主题、插件链：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="typescript" data-theme="github-light github-dark"><code data-language="typescript" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">const</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> config</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">:</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> QuartzConfig</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> {</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  configuration: {</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    pageTitle: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;站点标题&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,          </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 浏览器标签栏显示的名称</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    pageTitleSuffix: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot; | 你的名字&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,  </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 每个页面标题的后缀</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    locale: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;zh-CN&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,               </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 界面语言（搜索框占位符等）</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    baseUrl: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;你的域名.com&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,        </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 部署后的域名，影响 RSS 和 OG 链接</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    enableSPA: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,               </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 启用 SPA 模式，页面切换不刷新</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    enablePopovers: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,          </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 鼠标悬停链接时弹出预览卡片</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    analytics: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">null</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,               </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 分析服务（Plausible/Google 等，不需要就 null）</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    defaultDateType: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;modified&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,   </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 文章日期默认用修改时间还是创建时间</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    theme: {</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      typography: {</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        header: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Schibsted Grotesk&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        body: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Source Sans Pro&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        code: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;IBM Plex Mono&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      },</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      colors: {</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        lightMode: { </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">/* 亮色主题色板 */</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> },</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        darkMode: { </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">/* 暗色主题色板 */</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> },</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      },</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    },</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  },</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  plugins: {</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    transformers: [</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">FrontMatter</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                    </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 解析 YAML 头</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">CreatedModifiedDate</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">({             </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 提取创建/修改日期</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        priority: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;frontmatter&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;git&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;filesystem&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">],</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      }),</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">SyntaxHighlighting</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">({              </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 代码高亮（Shiki）</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        theme: { light: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;github-light&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, dark: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;github-dark&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> },</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      }),</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ObsidianFlavoredMarkdown</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),       </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 解析 [[wikilink]]</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">GitHubFlavoredMarkdown</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),         </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// GFM 扩展（表格、任务列表等）</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TableOfContents</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 生成右侧目录</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">CrawlLinks</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">({                      </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 解析链接关系</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        markdownLinkResolution: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;shortest&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      }),</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Description</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                    </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 自动生成页面描述</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Latex</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">({ renderEngine: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;katex&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }), </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// LaTeX 渲染</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    ],</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    filters: [</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">RemoveDrafts</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                   </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 过滤 draft: true 的页面</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    ],</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    emitters: [</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ContentPage</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                    </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 生成每篇文章的 HTML</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">FolderPage</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                     </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 生成目录列表页</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TagPage</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                        </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 生成标签聚合页</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ContentIndex</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">({                    </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 生成搜索索引 + RSS + sitemap</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        enableSiteMap: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        enableRSS: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      }),</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Assets</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                         </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 复制静态资源</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Favicon</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                        </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 生成 favicon</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">NotFoundPage</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                   </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 404 页面</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      Plugin.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">CustomOgImages</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),                 </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 生成 OG 社交分享图</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    ],</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  },</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span></code></pre></figure>
+<p>每个插件的顺序有讲究：<code>transformers</code> 按序执行，<code>CrawlLinks</code> 必须在 <code>ObsidianFlavoredMarkdown</code> 之后，因为需要先解析出 wikilink 才能爬取链接关系。</p>
+<p><strong><code>quartz.layout.ts</code></strong> 控制页面布局（左侧栏 / 正文 / 右侧栏分别放什么组件）：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="typescript" data-theme="github-light github-dark"><code data-language="typescript" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">export</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> const</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> defaultContentPageLayout</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">:</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> PageLayout</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> =</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> {</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  beforeBody: [</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Breadcrumbs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),     </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 面包屑导航</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ArticleTitle</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),    </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 文章标题</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ContentMeta</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),     </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 日期、阅读时间</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TagList</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),         </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 标签列表</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  ],</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  left: [</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">PageTitle</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),       </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 站点标题</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Search</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),          </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 搜索框</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Darkmode</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),        </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 暗色模式切换</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Explorer</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),        </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 文件浏览器</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  ],</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  right: [</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Graph</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),           </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 关系图谱</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TableOfContents</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(), </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 文章内目录</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    Component.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Backlinks</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(),       </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 反向链接</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  ],</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  center: [],                    </span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">// 正文由框架自动渲染</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span></code></pre></figure>
+<h3 id="写第一篇内容">写第一篇内容<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#写第一篇内容" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>content/index.md</code> 是首页。Frontmatter 是 YAML 格式的元数据块：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">---</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">title</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;文章标题&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">tags</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">标签1</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">标签2</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">date</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">2026-08-08</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">---</span></span></code></pre></figure>
+<p>正文用 Markdown，<code>[[路径]]</code> 创建双向链接。</p>
+<h3 id="本地预览">本地预览<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#本地预览" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">npx</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> quartz</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> build</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --serve</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --port</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 8080</span></span></code></pre></figure>
+<p><code>build</code> 执行完整构建，<code>--serve</code> 启动本地 HTTP 服务器并开启 WebSocket 热重载。改完 <code>content/</code> 下的文件后手动重新运行此命令。浏览器打开 <code>http://localhost:8080</code>。</p>
+<blockquote>
+<p>目前 Quartz v4.5.2 没有文件监听自动重建功能，每次改完内容需要手动 rebuild。</p>
+</blockquote>
+<h3 id="构建输出">构建输出<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#构建输出" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>构建产物在 <code>public/</code> 目录：</p>
+<pre><code>public/
+  index.html                           ← 首页
+  notes/网站搭建/个人网站搭建全记录.html  ← 文章页
+  notes/网站搭建/                       ← 目录列表页
+  tags/教程.html                        ← 标签聚合页
+  index.xml                            ← RSS feed
+  sitemap.xml                          ← 站点地图
+  static/contentIndex.json             ← 搜索索引
+  static/*.js, *.css                   ← 框架 JS/CSS
+  assets/meme.jpg                      ← 用户静态资源
+</code></pre>
+<p>每个 Markdown 源文件生成一个 HTML 页面。目录生成列表页。标签生成聚合页。搜索索引是一个 JSON 文件，客户端加载后用 Flexsearch 做本地搜索。</p>
+<h3 id="部署">部署<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#部署" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>GitHub Pages 方案：</p>
+<ol>
+<li>在 GitHub 创建仓库 <code>用户名.github.io</code></li>
+<li>在项目根目录创建 <code>.github/workflows/deploy.yml</code>：</li>
+</ol>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Deploy</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">on</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  push</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    branches</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">v4</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">]</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">jobs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  build-and-deploy</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    runs-on</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ubuntu-latest</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    steps</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">uses</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">actions/checkout@v4</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">uses</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">actions/setup-node@v4</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        with</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          node-version</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">24</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">run</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">npm ci</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">run</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">npx quartz build</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">uses</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">peaceiris/actions-gh-pages@v4</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        with</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          github_token</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">${{ secrets.GITHUB_TOKEN }}</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          publish_dir</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">./public</span></span></code></pre></figure>
+<ol start="3">
+<li>在仓库 Settings > Pages 中，Source 选 “Deploy from a branch”，分支选 <code>gh-pages</code></li>
+</ol>
+<p>每次 <code>git push</code> 后 GitHub Actions 自动构建并部署。GitHub Pages 免费，无限流量，自带 <code>github.io</code> 子域名。</p>
+<p>Vercel / Netlify 方案类似，且对 Next.js 以外的框架也没有额外优势，此处略。</p>
+<h2 id="踩坑记录">踩坑记录<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#踩坑记录" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="github-连接问题">GitHub 连接问题<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#github-连接问题" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>国内直连 GitHub 经常超时或速度极慢（&lt;20KB/s）。解决方案按优先级排列：</p>
+<ol>
+<li>VPN 连日本或新加坡节点</li>
+<li>在浏览器中下载 ZIP 包（浏览器下载通常比 git clone 快，因为浏览器会用多线程）</li>
+<li>Gitee 没有 Quartz 的镜像（搜到的是同名的 Java Quartz 定时任务框架）</li>
+</ol>
+<h3 id="端口占用">端口占用<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#端口占用" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>第二次运行 <code>npx quartz build --serve</code> 时可能报 <code>EADDRINUSE</code>。因为上次的 Node 进程还占着端口。解决：</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 在 Windows 上找到占用端口的进程</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">netstat</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -ano</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> findstr</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> :8080</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 记下 PID，然后</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">taskkill</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> //PID</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">PI</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">D</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> //F</span></span></code></pre></figure>
+<h3 id="字体加载">字体加载<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#字体加载" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>默认配置从 Google Fonts 加载字体（<code>quartz.config.ts</code> 中 <code>fontOrigin: &quot;googleFonts&quot;</code>）。国内访问 Google Fonts 不通，但字体加载失败不影响页面可用性——浏览器会回退到系统默认字体。如果介意，可以把 <code>fontOrigin</code> 改为 <code>&quot;local&quot;</code> 并自行提供字体文件。</p>
+<h3 id="内容目录变更">内容目录变更<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#内容目录变更" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><code>content/</code> 目录是站点的内容根目录。新建子目录后第一次构建会生成对应的列表页。目录名和文件名会原样出现在 URL 中（中文会被 URL 编码）。修改文件名或目录名会导致旧 URL 失效，目前 Quartz 不会自动生成重定向。</p>
+<h2 id="后续">后续<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#后续" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> 部署到 GitHub Pages</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 购买自定义域名</li>
+<li class="task-list-item"><input type="checkbox" disabled/> 积累内容</li>
+</ul></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>关系图谱</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-2" aria-expanded="true"><h3>目录</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-0" class="toc-content overflow"><li class="depth-0"><a href="#需求" data-for="需求">需求</a></li><li class="depth-0"><a href="#备选方案" data-for="备选方案">备选方案</a></li><li class="depth-1"><a href="#hugo" data-for="hugo">Hugo</a></li><li class="depth-1"><a href="#hexo" data-for="hexo">Hexo</a></li><li class="depth-1"><a href="#vitepress" data-for="vitepress">VitePress</a></li><li class="depth-1"><a href="#nextjs--mdx" data-for="nextjs--mdx">Next.js + MDX</a></li><li class="depth-1"><a href="#obsidian--quartz" data-for="obsidian--quartz">Obsidian + Quartz</a></li><li class="depth-0"><a href="#技术架构" data-for="技术架构">技术架构</a></li><li class="depth-0"><a href="#搭建过程" data-for="搭建过程">搭建过程</a></li><li class="depth-1"><a href="#环境" data-for="环境">环境</a></li><li class="depth-1"><a href="#获取-quartz" data-for="获取-quartz">获取 Quartz</a></li><li class="depth-1"><a href="#安装依赖" data-for="安装依赖">安装依赖</a></li><li class="depth-1"><a href="#项目结构" data-for="项目结构">项目结构</a></li><li class="depth-1"><a href="#配置" data-for="配置">配置</a></li><li class="depth-1"><a href="#写第一篇内容" data-for="写第一篇内容">写第一篇内容</a></li><li class="depth-1"><a href="#本地预览" data-for="本地预览">本地预览</a></li><li class="depth-1"><a href="#构建输出" data-for="构建输出">构建输出</a></li><li class="depth-1"><a href="#部署" data-for="部署">部署</a></li><li class="depth-0"><a href="#踩坑记录" data-for="踩坑记录">踩坑记录</a></li><li class="depth-1"><a href="#github-连接问题" data-for="github-连接问题">GitHub 连接问题</a></li><li class="depth-1"><a href="#端口占用" data-for="端口占用">端口占用</a></li><li class="depth-1"><a href="#字体加载" data-for="字体加载">字体加载</a></li><li class="depth-1"><a href="#内容目录变更" data-for="内容目录变更">内容目录变更</a></li><li class="depth-0"><a href="#后续" data-for="后续">后续</a></li><li class="overflow-end"></li></ul></div><div class="backlinks"><h3>反向链接</h3><ul id="list-1" class="overflow"><li><a href="../../archive" class="internal">归档</a></li><li><a href="../../" class="internal">欢迎</a></li><li><a href="../../notes/网站搭建/使用指南" class="internal">Quartz 日常使用指南</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v4.5.2</a> © 2026</p><ul></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../../postscript.js" type="module" data-persist="true"></script></html>
