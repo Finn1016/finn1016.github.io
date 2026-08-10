@@ -646,4 +646,11 @@ document.addEventListener("nav", async (e: CustomEventMap["nav"]) => {
     cleanupLocalGraphs()
     cleanupGlobalGraphs()
   })
+
+  // graph collapse toggle
+  document.querySelectorAll(".graph .graph-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      btn.closest(".graph")?.classList.toggle("collapsed")
+    })
+  })
 })

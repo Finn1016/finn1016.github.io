@@ -4,6 +4,8 @@ import { resolveRelative, simplifySlug } from "../util/path"
 import { i18n } from "../i18n"
 import { classNames } from "../util/lang"
 import OverflowListFactory from "./OverflowList"
+// @ts-ignore
+import script from "./scripts/backlinks.inline"
 
 interface BacklinksOptions {
   hideWhenEmpty: boolean
@@ -30,7 +32,27 @@ export default ((opts?: Partial<BacklinksOptions>) => {
     }
     return (
       <div class={classNames(displayClass, "backlinks")}>
-        <h3>{i18n(cfg.locale).components.backlinks.title}</h3>
+        <button
+          class="backlinks-header"
+          type="button"
+          aria-label="Toggle Backlinks"
+        >
+          <h3>{i18n(cfg.locale).components.backlinks.title}</h3>
+          <svg
+            class="fold"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="5 8 14 8"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
         <OverflowList>
           {backlinkFiles.length > 0 ? (
             backlinkFiles.map((f) => (
@@ -49,7 +71,10 @@ export default ((opts?: Partial<BacklinksOptions>) => {
   }
 
   Backlinks.css = style
-  Backlinks.afterDOMLoaded = overflowListAfterDOMLoaded
+  Backlinks.afterDOMLoaded = () => {
+    overflowListAfterDOMLoaded()
+    script()
+  }
 
   return Backlinks
 }) satisfies QuartzComponentConstructor
