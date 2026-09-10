@@ -45,7 +45,7 @@ date: 2026-08-10
 
 打开 [github.com/new](https://github.com/new)，填写：
 
-- **Repository name**：`用户名.github.io`。比如用户名是 `Finn1016`，就填 `finn1016.github.io`。只有仓库叫这个名字，GitHub Pages 才会把网站挂在 `https://用户名.github.io`。
+- **Repository name**：`用户名.github.io`。比如用户名是 `example`，就填 `example.github.io`。只有仓库叫这个名字，GitHub Pages 才会把网站挂在 `https://用户名.github.io`。
 - **类型**：选 Public。GitHub Pages 要求公开仓库。
 - **不要勾选** "Add a README file"、"Add .gitignore"、"Choose a license"。本地已经有完整的项目文件，GitHub 上创建额外文件会导致推送时冲突。
 
@@ -58,10 +58,10 @@ date: 2026-08-10
 ### 2.1 进入项目目录
 
 ```powershell
-D: ; cd D:\Finn\PersonalWebsite
+D: ; cd D:\你的项目目录
 ```
 
-路径换成自己的。Windows PowerShell 换盘符需要先打 `D:` 再 `cd`。
+路径换成自己的。若在 PowerShell 中操作，切换盘符需要先单独输入盘符名（如 `D:`）再 `cd`。
 
 ### 2.2 初始化 Git 仓库
 
@@ -111,7 +111,7 @@ git push -u origin v4
 
 这一步可能弹出 `The authenticity of host 'github.com' can't be established`，输入 `yes` 回车。只在首次连接时出现。
 
-如果推送中途报 `Connection was reset`，说明网络到 GitHub 不通。开启 VPN 后重新 `git push`。Git 支持断点续传，不会重复上传已推送过的内容。
+如果推送中途报 `Connection was reset`，说明当前网络到 GitHub 不通。检查网络或代理后重新 `git push`。Git 支持断点续传，不会重复上传已推送过的内容。
 
 ## 第三步：启用 GitHub Pages
 
@@ -198,7 +198,7 @@ npm install
 
 ### Push 时报 Connection was reset
 
-网络问题。开启 VPN 后重新 `git push`。
+网络问题。检查网络或代理后重新 `git push`。
 
 ### Actions 工作流跑红
 

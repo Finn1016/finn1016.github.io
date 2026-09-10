@@ -1,0 +1,17 @@
+# 依赖
+node_modules/
+
+# 构建输出（由 GitHub Actions 生成）
+public/
+
+# Quartz 构建缓存
+.quartz-cache/
+
+# 本地工具配置
+.claude/
+.dsh/
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+*.log
